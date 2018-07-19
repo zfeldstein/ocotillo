@@ -8,3 +8,4 @@ def create_text_file(url=None):
     url = 'https://www.space.com/16907-what-is-the-temperature-of-mars.html'
     text_data = html_to_text(url)
 
+create_text_file()

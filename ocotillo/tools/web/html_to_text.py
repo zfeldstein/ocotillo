@@ -9,7 +9,7 @@ def html_to_text(url):
         print("Unable to query %s" % url)
         return False
     soup = BeautifulSoup(sources,"html.parser")
-    for script in soup(["script", "style"]):
+    for script in soup(["script", "style", 'a']):
         script.decompose()
     text = soup.get_text()
     # break into lines and remove leading and trailing space on each
