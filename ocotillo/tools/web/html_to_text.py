@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib import request
 
-def html_to_text(url):
+def html_to_text(url, outfile):
     print("querying url %s" % url)
     try: 
         sources = request.urlopen(url).read().decode('utf8')
@@ -18,6 +18,8 @@ def html_to_text(url):
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
-    f = open("mars_temp.txt","w")
+    f = open(outfile,"w")
     f.write(text)
     return text
+
+html_to_text('https://books.google.com/books?id=8lGNQMUTr0gC&printsec=frontcover&dq=cosmology+history&hl=en&sa=X&ved=0ahUKEwi4ttjq1MjcAhWSyIMKHT7LA1cQ6AEIRTAF#v=onepage&q=cosmology%20history&f=false', './google-book.txt')
