@@ -45,43 +45,22 @@ def parse_facts(doc):
     knowledge[subject] = clean_facts
     return knowledge
 
-# #TODO make this a parameter  based on document i.e. (Monty Python Flying Circus)
-# db_name = 'mars'
-# 
-# db = client[db_name]
-# document = {
-#     'facts' : [
-#         knowledge[subject]
-#     ]
-# }
-# knowledge['subject'] = json.dumps(knowledge[subject])
-# db.inventory.insert_one(knowledge[subject])
-# collection_name = str(subject)
-# db[collection_name].insert_one(document)
+def insert_documents(doc):    
+    db_data = parse_facts(doc)
+    db_name = 'mars'
+    db = client[db_name]
+    for subject, facts in db_data.items():
+        print(subject,facts)
+        collection_name = str(subject)
+        document = {
+        'facts' : [
+            db_data[subject]
+            ]
+        }
+        db[collection_name].insert_one(document)
 
-
-# print(knowledge)
-# for i in knowledge:
-#     print("Details about a %s" % (i))
-#     for x in knowledge[i]:
-#         print("facts %s" % (x))
-    
-    
 doc ='The big blue planet reaches 9100 degrees farenheit.'
-db_data = parse_facts(doc)
-print(db_data)
-db_name = 'mars'
-db = client[db_name]
-for subject, facts in db_data.items():
-    print(subject,facts)
-    collection_name = str(subject)
-    document = {
-    'facts' : [
-        db_data[subject]
-        ]
-    }
-    db[collection_name].insert_one(document)
-
-
+doc = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
+insert_documents(doc)
 
      
