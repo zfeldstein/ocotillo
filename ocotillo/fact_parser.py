@@ -1,5 +1,6 @@
 import spacy
 import json
+import pprint
 from pymongo import MongoClient
 
 
@@ -8,9 +9,8 @@ client = MongoClient('localhost',
                     password='example',
                     # authSource='the_database',
                     authMechanism='SCRAM-SHA-256')
-
-
-
+db_name = 'mars'
+db = client[db_name]
 
 # string = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
 nlp = spacy.load('en_core_web_sm')
@@ -47,20 +47,46 @@ def parse_facts(doc):
 
 def insert_documents(doc):    
     db_data = parse_facts(doc)
-    db_name = 'mars'
-    db = client[db_name]
     for subject, facts in db_data.items():
-        print(subject,facts)
-        collection_name = str(subject)
+        subject_str = str(subject)
         document = {
-        'facts' : [
-            db_data[subject]
-            ]
+        'subject': subject_str,
+        'facts' : db_data[subject]
         }
-        db[collection_name].insert_one(document)
+        db['facts'].insert_one(document)
 
-doc ='The big blue planet reaches 9100 degrees farenheit.'
+# doc ='The big blue planet reaches 9100 degrees farenheit.'
 doc = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
-insert_documents(doc)
 
-     
+facts = db['facts']
+# pprint.pprint(facts.find_one())
+#
+
+
+# wolf = facts.find({"subject": {"$in": ["planet", "D"]}})
+# print(wolf)
+for row in facts.find({"subject" : "planet"}):
+    for fact in row['facts']:
+        print(fact)
+
+# cursor = db.facts.find({})
+# for row in cursor:
+#     print(row)
+# cursor = planet.find({"facts":  ["big",
+#             "blue",
+#             "9100",
+#             "degrees",
+#             "farenheit"
+#         ]})
+
+# cursor = planet.find({"facts":  ["big",
+#             "blue"
+#         ]})
+
+# # 
+# pprint.pprint(facts)
+# print([i for i in cursor])
+
+
+
+# insert_documents(doc)
