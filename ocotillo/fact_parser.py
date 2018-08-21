@@ -28,7 +28,7 @@ def fact_clean(facts, subject):
             pass
         else:
             # print(i.text)
-            final_facts.append(i.text)
+            final_facts.append({"object" : i.text})
     return final_facts
 
 #TODO Change to filename as first arg
@@ -54,20 +54,23 @@ def insert_documents(doc):
         'facts' : db_data[subject]
         }
         db['facts'].insert_one(document)
+        
+def get_documents(db, collection, subject):
+    collection = db[collection]
+    for row in collection.find({'subject': 'planet', 'facts.object' : 'red'}):
+        print(row)
 
 # doc ='The big blue planet reaches 9100 degrees farenheit.'
 doc = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
 
-facts = db['facts']
+
+docs = get_documents(db,'facts','planet')
 # pprint.pprint(facts.find_one())
 #
 
 
 # wolf = facts.find({"subject": {"$in": ["planet", "D"]}})
 # print(wolf)
-for row in facts.find({"subject" : "planet"}):
-    for fact in row['facts']:
-        print(fact)
 
 # cursor = db.facts.find({})
 # for row in cursor:
