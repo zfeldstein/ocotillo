@@ -22,6 +22,7 @@ def fact_clean(facts, subject):
     #Clean Facts remove subject and det's
     facts = ' '.join(facts)
     facts = nlp(facts)
+    print(list(facts))
     final_facts = []
     for i in facts:
         if i.pos_ in ['DET'] or i.text == subject.text:
@@ -35,14 +36,22 @@ def fact_clean(facts, subject):
 def parse_facts(doc):
     doc = nlp(doc)
     knowledge = {}
-    root = [token for token in doc if token.head == token][0]
-    subject = list(root.lefts)[0]
-    #Gather Facts
-    facts = []
-    for chunk in doc.noun_chunks:
-        facts.append(chunk.text)
-    clean_facts = fact_clean(facts,subject)
-    knowledge[subject] = clean_facts
+    for sent in doc.sents:
+        root = [token for token in sent if token.head == token][0]
+        subject = list(root.lefts)[0]
+        # print(len(subject))
+        
+        # print(list(root.lefts))
+        # subject = root.lefts
+        # print(list(subject)[0])
+        # subject = sent.root
+        #Gather Facts
+        facts = []
+        for chunk in sent.noun_chunks:
+            # print(dir(chunk))
+            facts.append(chunk.text)
+        clean_facts = fact_clean(facts,subject)
+        knowledge[subject] = clean_facts
     return knowledge
 
 def insert_documents(doc):    
@@ -55,41 +64,23 @@ def insert_documents(doc):
         }
         db['facts'].insert_one(document)
         
-def get_documents(db, collection, subject):
+def get_documents(db, collection, subject, objects=None):
     collection = db[collection]
-    for row in collection.find({'subject': 'planet', 'facts.object' : 'red'}):
-        print(row)
+    for row in collection.find({'subject': subject, 'facts.object' : objects}):
+        for i in row['facts']:
+            print(i['object'])
 
 # doc ='The big blue planet reaches 9100 degrees farenheit.'
 doc = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
 
 
-docs = get_documents(db,'facts','planet')
-# pprint.pprint(facts.find_one())
-#
-
-
-# wolf = facts.find({"subject": {"$in": ["planet", "D"]}})
-# print(wolf)
-
-# cursor = db.facts.find({})
-# for row in cursor:
-#     print(row)
-# cursor = planet.find({"facts":  ["big",
-#             "blue",
-#             "9100",
-#             "degrees",
-#             "farenheit"
-#         ]})
-
-# cursor = planet.find({"facts":  ["big",
-#             "blue"
-#         ]})
-
-# # 
-# pprint.pprint(facts)
-# print([i for i in cursor])
+# docs = get_documents(db,'facts','planet', 'red')
 
 
 
-# insert_documents(doc)
+# doc = open('./data/mars-temp.txt').read()
+doc = open('data/wiki-mars.txt').read()
+
+
+
+insert_documents(doc)
