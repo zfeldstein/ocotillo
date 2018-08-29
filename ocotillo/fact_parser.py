@@ -70,7 +70,7 @@ def get_documents(db, collection, subject, objects=None):
     # print(subject)
     collection = db[collection]
     # ({'subject': subject, 'facts.object' : objects})
-    for row in collection.find({'subject': subject}):
+    for row in collection.find({'subject': subject, 'facts.object': 'Sun'}):
         for i in row['facts']:
             print(i['object'])
 
