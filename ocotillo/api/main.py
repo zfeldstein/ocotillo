@@ -6,9 +6,8 @@ from pymongo import MongoClient
 from flask import jsonify
 from flask import request
 
-
-# app = Flask(__name__)
 app = Flask('fact_find')
+# BASE_URL = '/api/v1'
 client = MongoClient('localhost',
                     username='root',
                     password='example',
@@ -24,14 +23,13 @@ def log(var, msg='Here is your var'):
 
 # exampl/api/v1/mars/subject
 @app.route('/api/v1/<acct>/<doc_name>')
-def get_subject(acct, doc_name, methods=['GET']):
+def get_facts(acct, doc_name, methods=['GET']):
     content = request.get_json()
     if content:
         #Must specify a subject to query
         if content.get('subject') == None:
             return jwrap('error', 'specify subject in request')
-        db_name = acct
-        db = client[db_name]
+        db = client[acct]
         collection = db[doc_name]
         result = []
         if content.get('object') != None:
@@ -47,6 +45,12 @@ def get_subject(acct, doc_name, methods=['GET']):
     else:
         app.logger.warn("No json found %s" % content)        
         return "NoJsonError"
+    
+@app.route('/api/v1/<acct>/docs')
+def list_docs(acct):
+    db = client[acct]
+    collections = db.list_collection_names()
+    return jwrap('docs' , collections  )
             
 
 if __name__ == '__main__':
