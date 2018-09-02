@@ -19,21 +19,20 @@ def jwrap(key,values):
     return json_obj
 
 def log(var, msg='Here is your var'):
-    
     app.logger.info("%s %s" % ( msg, var))
     
 
 # exampl/api/v1/mars/subject
-@app.route('/api/v1/<db>/subject')
-def get_subjects(db, collection='facts', methods=['GET']):
+@app.route('/api/v1/<acct>/<doc_name>')
+def get_subject(acct, doc_name, methods=['GET']):
     content = request.get_json()
     if content:
         #Must specify a subject to query
         if content.get('subject') == None:
             return jwrap('error', 'specify subject in request')
-        db_name = db
+        db_name = acct
         db = client[db_name]
-        collection = db[collection]
+        collection = db[doc_name]
         result = []
         if content.get('object') != None:
             results = collection.find({'subject': content['subject'], 'facts.object': content['object']})

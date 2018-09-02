@@ -9,8 +9,8 @@ client = MongoClient('localhost',
                     password='example',
                     # authSource='the_database',
                     authMechanism='SCRAM-SHA-256')
-db_name = 'mars'
-db = client[db_name]
+# db_name = 'mars'
+# db = client[db_name]
 
 # string = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
 nlp = spacy.load('en_core_web_sm')
@@ -56,7 +56,8 @@ def parse_facts(doc):
         knowledge[subject] = clean_facts
     return knowledge
 
-def insert_documents(doc):    
+def insert_documents(db, doc_name, doc):
+    db = client[db]    
     db_data = parse_facts(doc)
     for subject, facts in db_data.items():
         subject_str = str(subject)
@@ -64,7 +65,7 @@ def insert_documents(doc):
         'subject': subject_str,
         'facts' : db_data[subject]
         }
-        db['facts'].insert_one(document)
+        db[doc_name].insert_one(document)
         
 def get_documents(db, collection, subject, objects=None):
     # print(subject)
@@ -78,7 +79,7 @@ def get_documents(db, collection, subject, objects=None):
 doc = 'The small red planet reaches 60 degrees farenheit. The big blue planet reaches 40 degrees farenheit.'
 
 
-docs = get_documents(db,'facts','Mars', 'Mars')
+# docs = get_documents(db,'facts','Mars', 'Mars')
 
 
 
@@ -87,4 +88,4 @@ doc = open('data/wiki-mars.txt').read()
 
 
 
-# insert_documents(doc)
+insert_documents('acct_01', 'space_doc', doc)
