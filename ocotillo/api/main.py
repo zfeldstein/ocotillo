@@ -1,5 +1,6 @@
 #!flask/bin/python
 import sys
+import os
 import logging
 from flask import Flask
 from docs import docs
@@ -60,9 +61,10 @@ def upload_file(acct, doc_name):
     if 'file' not in request.files:
         return "No file found"
     doc = request.files['file']
-    doc_path = './uploads/docs/{}/{}'.format(acct,doc_name)
+    doc_path = os.path.abspath('./uploads/docs/{}/{}'.format(acct,doc_name))
     open(doc_path, 'w')
     doc.save(doc_path)
+    docs.create_doc_col(acct, doc_name, doc_path)
     return "Doc {} successfully saved".format(doc_path)
 
 if __name__ == '__main__':

@@ -48,8 +48,9 @@ def parse_facts(doc):
         knowledge[subject] = clean_facts
     return knowledge
 
-def insert_documents(db, doc_name, doc):
-    db = client[db]    
+def create_doc_col(db, doc_name, doc):
+    doc = open(doc).read()
+    db = client[db]
     db_data = parse_facts(doc)
     for subject, facts in db_data.items():
         subject_str = str(subject)
