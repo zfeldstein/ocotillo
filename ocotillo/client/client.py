@@ -11,6 +11,8 @@ parser.add_argument("-f", "--facts", action='store',
                     help="information relating to the subject (-f oceans) ")
 parser.add_argument("-d", "--docs", action='store_true', 
                     help="List all created document databases ( --docs ) ")
+parser.add_argument("-u", "--upload", action='store', 
+                    help="Upload file to be parsed ( --upload /file.pdf ) ")
 args = parser.parse_args()
 
 ACCOUNT = 'acct_01'
@@ -30,9 +32,15 @@ def search_doc():
 def list_docs():
     url = '%s/docs' % ( BASE_URL)
     print(api_call(url))
-    
-    
 
+def upload_doc(doc_path):
+    url = '%s/docs/mars' % ( BASE_URL)
+    files = {'file': open(doc_path, 'rb')}
+    r = requests.post(url, files=files)
+    print(r.text)
+    
+if args.upload:
+    upload_doc(args.upload)
 if args.search:
     search_doc()
 if args.docs:

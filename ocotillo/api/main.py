@@ -2,6 +2,7 @@
 import sys
 import logging
 from flask import Flask
+from docs import docs
 from pymongo import MongoClient
 from flask import jsonify
 from flask import request
@@ -46,12 +47,23 @@ def get_facts(acct, doc_name, methods=['GET']):
         app.logger.warn("No json found %s" % content)        
         return "NoJsonError"
     
-@app.route('/api/v1/<acct>/docs')
+@app.route('/api/v1/<acct>/docs', methods=['GET'])
 def list_docs(acct):
     db = client[acct]
     collections = db.list_collection_names()
     return jwrap('docs' , collections  )
             
+# DOC parse and upload 
+@app.route('/api/v1/<acct>/docs/<doc_name>', methods=['POST'])
+def upload_file(acct, doc_name):
+    # checking if the file is present or not.
+    if 'file' not in request.files:
+        return "No file found"
+    doc = request.files['file']
+    doc_path = './uploads/docs/{}/{}'.format(acct,doc_name)
+    open(doc_path, 'w')
+    doc.save(doc_path)
+    return "Doc {} successfully saved".format(doc_path)
 
 if __name__ == '__main__':
     app.run(debug=True)
