@@ -36,9 +36,10 @@ def parse_facts(doc):
     knowledge = {}
     for sent in doc.sents:
         root = [token for token in sent if token.head == token][0]
-        subject = list(root.lefts)[0]
-        subject = clean_subject(subject)
-        if not subject:
+        if root:
+            subject = list(root.lefts)[0]        
+            subject = clean_subject(subject)
+        else:
             continue
         #Gather Facts
         facts = []
