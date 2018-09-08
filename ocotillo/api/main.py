@@ -75,6 +75,7 @@ def upload_file(acct, doc_name):
     open(doc_path, 'w')
     doc.save(doc_path)
     docs.create_doc_col(acct, doc_name, doc_path)
+    os.remove(doc_path)
     return "Doc {} successfully saved".format(doc_path)
 
 if __name__ == '__main__':
