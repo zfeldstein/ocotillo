@@ -38,8 +38,9 @@ def parse_facts(doc):
         root = [token for token in sent if token.head == token][0]
         if root:
             subject = list(root.lefts)[0]        
-            subject = clean_subject(subject)
         else:
+            continue
+        if not clean_subject(subject):
             continue
         #Gather Facts
         facts = []

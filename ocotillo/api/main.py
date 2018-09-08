@@ -53,7 +53,17 @@ def list_docs(acct):
     db = client[acct]
     collections = db.list_collection_names()
     return jwrap('docs' , collections  )
-            
+
+@app.route('/api/v1/<acct>/docs/<doc_name>', methods=['DELETE'])
+def delete_doc(acct, doc_name):
+    db = client[acct]
+    collections = db.drop_collection(doc_name)
+    log(collections['ok'], "ohhyeahh")
+    if collections['ok'] == 0.0:
+        return jwrap('docs', 'doc {} not found or doesn\'t exist'.format(doc_name))
+    else:
+        return jwrap('docs' , '{} deleted sucessfully'.format(doc_name) )
+
 # DOC parse and upload 
 @app.route('/api/v1/<acct>/docs/<doc_name>', methods=['POST'])
 def upload_file(acct, doc_name):

@@ -2,6 +2,7 @@
 import requests
 import argparse
 import sys
+
 import os
 
 ACCOUNT = 'acct_01'
@@ -10,24 +11,33 @@ BASE_URL = 'http://localhost:5000/api/v1/{}'.format(ACCOUNT)
 HEADERS = {'content-type': 'application/json'}
 COMMANDS = ['docs']
 
-def api_call(url, payload=None, headers=HEADERS):
-    r = requests.get(url, headers=HEADERS, json=payload)
+def api_call(url, method='get', payload=None, headers=HEADERS):
+    if method == 'get':
+        r = requests.get(url, headers=HEADERS, json=payload)
+    if method == 'post':
+        r = requests.post(url, files=payload)
+    if method == 'delete':
+        r = requests.delete(url)
     return r.text
 
+def delete_doc():
+    url = '{}/docs/{}'.format(BASE_URL, args.doc_name)
+    print(api_call(url, method='delete'))
+
 def search_doc():
-    url ='%s/%s' % (BASE_URL, args.search)
+    # url ='%s/%s' % (BASE_URL, args.search)
+    url = '{}/docs/{}'.format(BASE_URL, args.search)
     payload = {"subject": args.subject, 'object': args.facts}
     print(api_call(url, payload))
     
 def list_docs():
-    url = '%s/docs' % ( BASE_URL)
+    url = '{}/docs'.format(BASE_URL)
     print(api_call(url))
 
 def upload_doc(doc_name, doc_path):
     url = '{}/docs/{}'.format(BASE_URL,doc_name)
     files = {'file': open(doc_path, 'rb')}
-    r = requests.post(url, files=files)
-    print(r.text)
+    print(api_call(url, method='post', payload=files))
 
 parser = argparse.ArgumentParser()
 # parser.add_argument("-s", "--search", action="store",
@@ -53,6 +63,11 @@ upload_parser.add_argument("-n", "--name", dest="doc_name",
 
 search_parser = subparsers.add_parser("search")
 
+delete_parser = subparsers.add_parser("delete")
+delete_parser.add_argument("doc_name", help="Name of doc database you want deleted")
+delete_parser.add_argument("-y", "--yes", dest="delete_yes", action='store_true',
+                           help='suppress y/n prmopt on deletes')
+
 # # If no argument supplied or not valid display help
 if sys.argv[1] not in COMMANDS:
     sys.argv.append('--help')
@@ -69,4 +84,12 @@ if args.docs == 'docs':
     if args.action == 'upload':
         doc_path = os.path.abspath(args.upload_file)
         upload_doc(args.doc_name, doc_path)
+    # Delete document, confirm delete before proceeding.
+    if args.action == 'delete':
+        if args.delete_yes:
+            delete_doc()
+        else:
+            confirm = input("Type yes to confirm deleteing doc\n")
+            if confirm.lower() == 'yes':
+                delete_doc()
         
