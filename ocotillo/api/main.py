@@ -24,18 +24,21 @@ def log(var, msg='Here is your var'):
     
 
 # exampl/api/v1/mars/subject
-@app.route('/api/v1/<acct>/<doc_name>')
-def get_facts(acct, doc_name, methods=['GET']):
+@app.route('/api/v1/<acct>/docs/<doc_name>/search', methods=['POST'])
+def search_doc(acct, doc_name ):
     content = request.get_json()
     if content:
         #Must specify a subject to query
-        if content.get('subject') == None:
-            return jwrap('error', 'specify subject in request')
+        if content.get('subject') == None and content.get('facts') == None:
+            return jwrap('error', 'specify subject or facts in request')
         db = client[acct]
         collection = db[doc_name]
         result = []
-        if content.get('object') != None:
-            results = collection.find({'subject': content['subject'], 'facts.object': content['object']})
+        if content.get('facts') != None:
+            if content.get('subject') == None:
+                results = collection.find({'facts.object': content['facts']})
+            else:
+                results = collection.find({'subject': content['subject'], 'facts.object': content['facts']})
         else:
             results = collection.find({'subject': content['subject']})
         for row in results:
@@ -58,7 +61,6 @@ def list_docs(acct):
 def delete_doc(acct, doc_name):
     db = client[acct]
     collections = db.drop_collection(doc_name)
-    log(collections['ok'], "ohhyeahh")
     if collections['ok'] == 0.0:
         return jwrap('docs', 'doc {} not found or doesn\'t exist'.format(doc_name))
     else:
@@ -66,10 +68,10 @@ def delete_doc(acct, doc_name):
 
 # DOC parse and upload 
 @app.route('/api/v1/<acct>/docs/<doc_name>', methods=['POST'])
-def upload_file(acct, doc_name):
+def upload_doc(acct, doc_name):
     # checking if the file is present or not.
     if 'file' not in request.files:
-        return "No file found"
+        return "No File"
     doc = request.files['file']
     doc_path = os.path.abspath('./uploads/docs/{}/{}'.format(acct,doc_name))
     open(doc_path, 'w')

@@ -11,11 +11,12 @@ BASE_URL = 'http://localhost:5000/api/v1/{}'.format(ACCOUNT)
 HEADERS = {'content-type': 'application/json'}
 COMMANDS = ['docs']
 
-def api_call(url, method='get', payload=None, headers=HEADERS):
+def api_call(url, method='get', payload=None, json=None, headers=HEADERS):
     if method == 'get':
         r = requests.get(url, headers=HEADERS, json=payload)
     if method == 'post':
-        r = requests.post(url, files=payload)
+        print(payload)
+        r = requests.post(url, files=payload, json=json)
     if method == 'delete':
         r = requests.delete(url)
     return r.text
@@ -26,9 +27,9 @@ def delete_doc():
 
 def search_doc():
     # url ='%s/%s' % (BASE_URL, args.search)
-    url = '{}/docs/{}'.format(BASE_URL, args.search)
-    payload = {"subject": args.subject, 'object': args.facts}
-    print(api_call(url, payload))
+    url = '{}/docs/{}/search'.format(BASE_URL, args.doc_name)
+    payload = {"subject": args.search_sub, 'facts': args.facts}
+    print(api_call(url, 'post', json=payload))
     
 def list_docs():
     url = '{}/docs'.format(BASE_URL)
@@ -62,6 +63,11 @@ upload_parser.add_argument("-n", "--name", dest="doc_name",
                            help='Name of endpoint you want created ( docs upload --file /file -n roman_history) ')
 
 search_parser = subparsers.add_parser("search")
+search_parser.add_argument("-sb", "--subject", dest='search_sub', 
+                     help="Person place or thing you want data about. ( -sb Earth)")
+search_parser.add_argument("-f", "--facts", dest='facts', 
+                    help="information relating to the subject (-f oceans) ")
+search_parser.add_argument("doc_name", help="Name of doc database you want deleted")
 
 delete_parser = subparsers.add_parser("delete")
 delete_parser.add_argument("doc_name", help="Name of doc database you want deleted")
@@ -92,4 +98,6 @@ if args.docs == 'docs':
             confirm = input("Type yes to confirm deleteing doc\n")
             if confirm.lower() == 'yes':
                 delete_doc()
+    if args.action == 'search':
+        search_doc()
         
