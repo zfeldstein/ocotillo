@@ -15,7 +15,6 @@ def api_call(url, method='get', payload=None, json=None, headers=HEADERS):
     if method == 'get':
         r = requests.get(url, headers=HEADERS, json=payload)
     if method == 'post':
-        print(payload)
         r = requests.post(url, files=payload, json=json)
     if method == 'delete':
         r = requests.delete(url)

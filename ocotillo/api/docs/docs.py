@@ -8,7 +8,7 @@ client = MongoClient('localhost',
                     username='root',
                     password='example',
                     authMechanism='SCRAM-SHA-256')
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('en_core_web_md')
 
 def fact_clean(facts, subject):
     #Clean Facts remove subject and det's
@@ -32,6 +32,7 @@ def clean_subject(subject):
 
 #TODO Change to filename as first arg
 def parse_facts(doc):
+    
     doc = nlp(doc)
     knowledge = {}
     for sent in doc.sents:
@@ -50,9 +51,13 @@ def parse_facts(doc):
         knowledge[subject] = clean_facts
     return knowledge
 
+def clean_doc(doc):
+    pass
+
 def create_doc_col(db, doc_name, doc):
     doc = open(doc).read()
     db = client[db]
+    # doc = clean_doc(doc)
     db_data = parse_facts(doc)
     for subject, facts in db_data.items():
         subject_str = str(subject)
