@@ -71,13 +71,16 @@ def delete_doc(acct, doc_name):
 def upload_doc(acct, doc_name):
     # checking if the file is present or not.
     if 'file' not in request.files:
+        #TODO add a 400 return code
         return "No File"
     doc = request.files['file']
     doc_path = os.path.abspath('./uploads/docs/{}/{}'.format(acct,doc_name))
     open(doc_path, 'w')
     doc.save(doc_path)
-    docs.create_doc_col(acct, doc_name, doc_path)
+    file_type = 'pdf'
+    created_doc = docs.create_doc_col(acct, doc_name, doc_path, file_type)
     os.remove(doc_path)
+    return jwrap("docs", created_doc)
     return "Doc {} successfully saved".format(doc_path)
 
 if __name__ == '__main__':

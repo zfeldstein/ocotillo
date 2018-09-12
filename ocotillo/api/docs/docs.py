@@ -1,5 +1,6 @@
 import spacy
 import json
+import slate
 import pprint
 from pymongo import MongoClient
 
@@ -32,7 +33,8 @@ def clean_subject(subject):
 
 #TODO Change to filename as first arg
 def parse_facts(doc):
-    
+    print('whatup')
+    print(doc)
     doc = nlp(doc)
     knowledge = {}
     for sent in doc.sents:
@@ -54,8 +56,15 @@ def parse_facts(doc):
 def clean_doc(doc):
     pass
 
-def create_doc_col(db, doc_name, doc):
-    doc = open(doc).read()
+def create_doc_col(db, doc_name, doc, file_type='txt'):
+    # PDFSyntaxError
+    if file_type == 'pdf':
+        with open(doc, 'rb') as f:
+            doc = slate.PDF(f)
+            print('AYO BIRD')
+            doc = str(doc)
+    elif file_type == 'txt':
+        doc = open(doc).read()
     db = client[db]
     # doc = clean_doc(doc)
     db_data = parse_facts(doc)
@@ -66,3 +75,5 @@ def create_doc_col(db, doc_name, doc):
         'facts' : db_data[subject]
         }
         db[doc_name].insert_one(document)
+    #TODO add real check and return real value
+    return "Sucesfully created doc database"
