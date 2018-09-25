@@ -38,8 +38,6 @@ def parse_facts(doc):
     for sent in doc.sents:
         root = [token for token in sent if token.head == token][0]
         if root:
-            print('AYO')
-            print(root)
             if len(list(root.lefts)) < 1:
                 continue
             subject = list(root.lefts)[0]        
@@ -64,9 +62,13 @@ def create_doc_col(db, doc_name, doc, file_type='txt'):
         with open(doc, 'rb') as f:
             doc = slate.PDF(f)
             doc = str(doc)
-    elif file_type == 'txt':
+    # file_type == text
+    else:
         doc = open(doc).read()
+    print('WHATUP')
+    print(file_type)
     db = client[db]
+    print(doc)
     # doc = clean_doc(doc)
     db_data = parse_facts(doc)
     for subject, facts in db_data.items():

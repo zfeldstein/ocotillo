@@ -3,6 +3,7 @@ import requests
 import argparse
 import sys
 import os
+import json
 
 
 ACCOUNT = 'acct_01'
@@ -16,8 +17,9 @@ def api_call(url, method='get', files=None, data=None, json=None, headers=HEADER
         r = requests.get(url, headers=headers, json=json)
     if method == 'post':
         print(files)
-        # r = requests.post(url, files=files, data=data, headers=headers, json=json)
-        r = requests.post(url, files=files, json=json)
+        # r = requests.post(url, files=files, data=json, headers=headers, json=json)
+        # r = requests.post(url, files=files, json=json, data=json, headers=headers)
+        r = requests.post(url, files=files)
     if method == 'delete':
         r = requests.delete(url)
     return r.text
@@ -38,10 +40,23 @@ def list_docs():
 
 def upload_doc(doc_name, doc_path, file_type):
     url = '{}/docs/{}'.format(BASE_URL,doc_name)
-    files = {'file': open(doc_path, 'rb')}
-    # headers = {'content-type': 'multipart/form-data'}
+    # file_type = { 'file_type': file_type }
+    # file_type = json.dumps(file_type)
+    print(file_type)
+    files = {'file': open(doc_path, 'rb'), 'file_type': file_type}
+    # files = [
+    #     ('files', ( 'file', open(doc_path, 'rb'), 'application/octet')),
+    #               
+    #     ('file_type', ('file_type', json.dumps(file_type), 'application/json'))
+    # 
+    # ]
+    headers = {'content-type': 'multipart/form-data'}
     meta_data = {"name": doc_name, "file_type": file_type}
+    # r = requests.post(url, files=files)
+    # print(r.text)
+    # print(api_call(url, method='post',  files=files, data=meta_data, headers=headers))
     print(api_call(url, method='post',  files=files))
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("docs",
