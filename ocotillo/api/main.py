@@ -1,4 +1,5 @@
 #!flask/bin/python
+import json
 import os
 
 from docs import docs
@@ -85,7 +86,7 @@ def upload_doc(acct, doc_name):
         # TODO(zf) add a 400 return code
         return "No File"
     doc = request.files['file']
-    file_type = request.files
+    file_type = json.load(request.files['file_type'])
     doc_path = os.path.abspath('./uploads/docs/{}/{}'.format(acct, doc_name))
     open(doc_path, 'w')
     doc.save(doc_path)

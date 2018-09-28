@@ -16,7 +16,6 @@ def api_call(url, method='get', files=None, data=None, json=None, headers=HEADER
     if method == 'get':
         r = requests.get(url, headers=headers, json=json)
     if method == 'post':
-        print(files)
         # r = requests.post(url, files=files, data=json, headers=headers, json=json)
         # r = requests.post(url, files=files, json=json, data=json, headers=headers)
         r = requests.post(url, files=files)
@@ -42,8 +41,7 @@ def upload_doc(doc_name, doc_path, file_type):
     url = '{}/docs/{}'.format(BASE_URL,doc_name)
     # file_type = { 'file_type': file_type }
     # file_type = json.dumps(file_type)
-    print(file_type)
-    files = {'file': open(doc_path, 'rb'), 'file_type': file_type}
+    files = {'file': open(doc_path, 'rb'), 'file_type': ( json.dumps(file_type))}
     # files = [
     #     ('files', ( 'file', open(doc_path, 'rb'), 'application/octet')),
     #               
